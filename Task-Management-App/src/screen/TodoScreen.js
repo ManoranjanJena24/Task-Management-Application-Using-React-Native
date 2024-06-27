@@ -1,11 +1,11 @@
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, FlatList } from 'react-native';
 import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import Fallback from '../components/Fallback';
+import todoScreenStyles from './TodoScreenStyles';
 
 const TodoScreen = () => {
-  // Init local states
   const [todo, setTodo] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -15,7 +15,6 @@ const TodoScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  // Handle Add Todo
   const handleAddTodo = () => {
     if (todo === "" || description === "" || dueDate === "") {
       return;
@@ -27,13 +26,11 @@ const TodoScreen = () => {
     setStatus("todo");
   };
 
-  // Handle Delete
   const handleDeleteTodo = (id) => {
     const updatedTodoList = todoList.filter((todo) => todo.id !== id);
     setTodoList(updatedTodoList);
   };
 
-  // Handle Edit Todo
   const handleEditTodo = (todo) => {
     setEditedTodo(todo);
     setTodo(todo.title);
@@ -42,7 +39,6 @@ const TodoScreen = () => {
     setStatus(todo.status);
   };
 
-  // Handle Update
   const handleUpdateTodo = () => {
     const updatedTodos = todoList.map((item) => {
       if (item.id === editedTodo.id) {
@@ -58,7 +54,6 @@ const TodoScreen = () => {
     setStatus("todo");
   };
 
-  // Handle Status Change
   const handleStatusChange = (id, newStatus) => {
     const updatedTodos = todoList.map((item) => {
       if (item.id === id) {
@@ -69,16 +64,15 @@ const TodoScreen = () => {
     setTodoList(updatedTodos);
   };
 
-  // Render Todo
   const renderTodos = ({ item }) => (
-    <View style={styles.todoContainer}>
-      <Text style={styles.todoTitle}>{item.title}</Text>
-      <Text style={styles.todoDescription}>{item.description}</Text>
-      <Text style={styles.todoDueDate}>Due: {item.dueDate}</Text>
-      <Text style={styles.todoStatus}>Status: {item.status}</Text>
+    <View style={todoScreenStyles.todoContainer}>
+      <Text style={todoScreenStyles.todoTitle}>{item.title}</Text>
+      <Text style={todoScreenStyles.todoDescription}>{item.description}</Text>
+      <Text style={todoScreenStyles.todoDueDate}>Due: {item.dueDate}</Text>
+      <Text style={todoScreenStyles.todoStatus}>Status: {item.status}</Text>
       <Picker
         selectedValue={item.status}
-        style={styles.statusPicker}
+        style={todoScreenStyles.statusPicker}
         onValueChange={(value) => handleStatusChange(item.id, value)}
       >
         <Picker.Item label="Todo" value="todo" />
@@ -90,34 +84,34 @@ const TodoScreen = () => {
     </View>
   );
 
-  // Filter and Search Logic
   const filteredTodos = todoList.filter((todo) => {
     return (filterStatus === "all" || todo.status === filterStatus) && todo.title.toLowerCase().includes(searchQuery.toLowerCase());
   });
-return (
-    <View style={{ marginHorizontal: 16 }}>
-      <Text style={styles.header}>Task Flow</Text>
+
+  return (
+    <ScrollView style={{ marginHorizontal: 16 }}>
+      <Text style={todoScreenStyles.header}>Task Flow</Text>
       <TextInput
-        style={styles.input}
+        style={todoScreenStyles.input}
         placeholder='Task Title'
         value={todo}
         onChangeText={(userText) => setTodo(userText)}
       />
       <TextInput
-        style={styles.input}
+        style={todoScreenStyles.input}
         placeholder='Description'
         value={description}
         onChangeText={(text) => setDescription(text)}
       />
       <TextInput
-        style={styles.input}
+        style={todoScreenStyles.input}
         placeholder='Due Date (YYYY-MM-DD)'
         value={dueDate}
         onChangeText={(text) => setDueDate(text)}
       />
       <Picker
         selectedValue={status}
-        style={styles.picker}
+        style={todoScreenStyles.picker}
         onValueChange={(itemValue) => setStatus(itemValue)}
       >
         <Picker.Item label="Todo" value="todo" />
@@ -125,23 +119,23 @@ return (
         <Picker.Item label="Done" value="done" />
       </Picker>
       {editedTodo ? (
-        <TouchableOpacity style={styles.button} onPress={handleUpdateTodo}>
-          <Text style={styles.buttonText}>Save</Text>
+        <TouchableOpacity style={todoScreenStyles.button} onPress={handleUpdateTodo}>
+          <Text style={todoScreenStyles.buttonText}>Save</Text>
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity style={styles.button} onPress={handleAddTodo}>
-          <Text style={styles.buttonText}>Add</Text>
+        <TouchableOpacity style={todoScreenStyles.button} onPress={handleAddTodo}>
+          <Text style={todoScreenStyles.buttonText}>Add</Text>
         </TouchableOpacity>
       )}
       <TextInput
-        style={styles.input}
+        style={todoScreenStyles.input}
         placeholder='Search by title'
         value={searchQuery}
         onChangeText={(text) => setSearchQuery(text)}
       />
       <Picker
         selectedValue={filterStatus}
-        style={styles.picker}
+        style={todoScreenStyles.picker}
         onValueChange={(itemValue) => setFilterStatus(itemValue)}
       >
         <Picker.Item label="All" value="all" />
@@ -151,76 +145,8 @@ return (
       </Picker>
       <FlatList data={filteredTodos} renderItem={renderTodos} keyExtractor={(item) => item.id} />
       {todoList.length <= 0 && <Fallback />}
-    </View>
+    </ScrollView>
   );
 };
 
 export default TodoScreen;
-
-const styles = StyleSheet.create({
-  header: {
-    marginTop: 50,
-    marginBottom: 20,
-    fontWeight: 'bold',
-    fontSize: 40
-  },
-  input: {
-    borderWidth: 2,
-    borderColor: "#1e90ff",
-    borderRadius: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginVertical: 6
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    marginVertical: 6
-  },
-  button: {
-    backgroundColor: "#000",
-    borderRadius: 6,
-    paddingVertical: 12,
-    marginVertical: 34,
-    alignItems: "center"
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 20
-  },
-  todoContainer: {
-    backgroundColor: "#1e90ff",
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 8,
-    marginBottom: 12,
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  todoTitle: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "800",
-    flex: 1
-  },
-  todoDescription: {
-    color: "#fff",
-    fontSize: 16,
-    flex: 1
-  },
-  todoDueDate: {
-    color: "#fff",
-    fontSize: 14,
-    flex: 1
-  },
-  todoStatus: {
-    color: "#fff",
-    fontSize: 14,
-    flex: 1
-  },
-  statusPicker: {
-    height: 50,
-    width: 150,
-  }
-});
