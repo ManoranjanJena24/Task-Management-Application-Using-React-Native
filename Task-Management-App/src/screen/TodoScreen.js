@@ -2,16 +2,7 @@ import {StyleSheet , Text, TextInput, View,TouchableOpacity, FlatList} from 'rea
 import React, { useState } from 'react';
 import { IconButton } from 'react-native-paper';
 
-const dummyData=[
-    {
-        id:"01",
-        title:"Wash Car",
-    },
-    {
-        id:"02",
-        title:"Read A book",
-    }
-]
+
 console.log(Date.now().toString())
 const TodoScreen=()=>{
 
