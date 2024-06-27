@@ -1,8 +1,8 @@
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, FlatList } from 'react-native';
 import React, { useState } from 'react';
 import { IconButton } from 'react-native-paper';
-import Fallback from '../components/Fallback';
 import { Picker } from '@react-native-picker/picker';
+import Fallback from '../components/Fallback';
 
 const TodoScreen = () => {
   // Init local states
@@ -58,6 +58,17 @@ const TodoScreen = () => {
     setStatus("todo");
   };
 
+  // Handle Status Change
+  const handleStatusChange = (id, newStatus) => {
+    const updatedTodos = todoList.map((item) => {
+      if (item.id === id) {
+        return { ...item, status: newStatus };
+      }
+      return item;
+    });
+    setTodoList(updatedTodos);
+  };
+
   // Render Todo
   const renderTodos = ({ item }) => (
     <View style={styles.todoContainer}>
@@ -65,6 +76,15 @@ const TodoScreen = () => {
       <Text style={styles.todoDescription}>{item.description}</Text>
       <Text style={styles.todoDueDate}>Due: {item.dueDate}</Text>
       <Text style={styles.todoStatus}>Status: {item.status}</Text>
+      <Picker
+        selectedValue={item.status}
+        style={styles.statusPicker}
+        onValueChange={(value) => handleStatusChange(item.id, value)}
+      >
+        <Picker.Item label="Todo" value="todo" />
+        <Picker.Item label="In Progress" value="in-progress" />
+        <Picker.Item label="Done" value="done" />
+      </Picker>
       <IconButton icon="pencil" iconColor='#505050' onPress={() => handleEditTodo(item)} />
       <IconButton icon="trash-can" iconColor='#F0F0F0' onPress={() => handleDeleteTodo(item.id)} />
     </View>
@@ -74,8 +94,7 @@ const TodoScreen = () => {
   const filteredTodos = todoList.filter((todo) => {
     return (filterStatus === "all" || todo.status === filterStatus) && todo.title.toLowerCase().includes(searchQuery.toLowerCase());
   });
-
-  return (
+return (
     <View style={{ marginHorizontal: 16 }}>
       <Text style={styles.header}>Task Flow</Text>
       <TextInput
@@ -199,5 +218,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     flex: 1
+  },
+  statusPicker: {
+    height: 50,
+    width: 150,
   }
 });
